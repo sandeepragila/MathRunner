@@ -115,6 +115,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "MathRunner"
+    }
+  },
+  "defaultProject": "MathRunner",
+  "cli": {
+    "analytics": false
+  }
 }

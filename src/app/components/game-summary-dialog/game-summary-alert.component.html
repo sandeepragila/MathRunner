@@ -1,0 +1,12 @@
+<mat-dialog-content style="text-align: center">
+<h1 style="color: #000042">Math Runner</h1>
+<h2 style="color: #000042">Well played!! Below are your game results</h2>
+<ul style="text-align: justify;">
+  <li *ngFor="let entry of gameSummaryInfo | keyvalue">
+    <div [ngStyle]="{'color':entry.value.isShortest ? 'green': 'grey'}">
+      Level: {{entry.key}} -------- Best Time: {{entry.value.time}} secs -------- Retries: {{entry.value.retries}}
+    </div>
+  </li>
+</ul>
+<p style="color: red">Now take a screenshot and share your score!</p>
+</mat-dialog-content>

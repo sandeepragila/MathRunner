@@ -1,0 +1,10 @@
+<mat-dialog-content style="text-align: center; font-family: cursive">
+  <p>
+    {{mainContent}}
+  </p>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-raised-button *ngFor="let text of buttonsText" matDialogClose="{{text}}" style="color: #287b26;">
+    {{text}}
+  </button>
+</mat-dialog-actions>

@@ -1,0 +1,13 @@
+mat-grid-tile {
+  background: lightblue;
+}
+
+.divElement {
+  position: fixed;
+  top: 70%;
+  left: 50%;
+  height: 100vh;
+  width: 100vh;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
