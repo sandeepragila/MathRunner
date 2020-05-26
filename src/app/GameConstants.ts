@@ -119,3 +119,10 @@ export class GameSummaryInfo {
     this._isShortest = value;
   }
 }
+
+export const AudioFiles = {
+  WALK: 'assets/sounds/pause.ogg',
+  BACK_GROUND: 'assets/sounds/music.mp3',
+  GAME_OVER: 'assets/sounds/game-over.ogg',
+  WRONG_STEP: 'assets/sounds/attack.ogg'
+}

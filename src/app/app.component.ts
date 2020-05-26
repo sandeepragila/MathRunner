@@ -7,6 +7,7 @@ import {CustomAlertDialogComponent} from './components/custom-alert-dialog/custo
 import {GameConstants, GameSummaryInfo, LevelInfo} from './GameConstants';
 import {GameSummaryAlertComponent} from './components/game-summary-dialog/game-summary-alert.component';
 import {GameInfoAlertComponent} from './components/game-info-dialog/game-info-alert.component';
+import {AudioService} from './audio/audio.service';
 
 @Component({
   selector: 'app-root',
@@ -29,10 +30,12 @@ export class AppComponent implements AfterViewInit {
   gameSummaryInfo: Map<number, GameSummaryInfo> = new Map();
   constructor(
     private dialog: MatDialog,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public audio: AudioService
   ) {
   }
   private startTimer() {
+    this.audio.bg.play();
     this.timeLeft = this.currLevelInfo.timeLimit;
     this.timer = setInterval(() => {
       if (this.timeLeft > 0) {
@@ -131,6 +134,7 @@ export class AppComponent implements AfterViewInit {
     if (!this.validate(step)) {
       return;
     }
+    this.audio.walk.play();
     this.calcResult(step);
     if (target.style.background === '' || target.style.background === 'lightblue') {
       if (this.result > this.currLevelInfo.solution) {
@@ -219,6 +223,7 @@ export class AppComponent implements AfterViewInit {
     return false;
   }
   private raisePopup(message: string, buttons?: any) {
+    this.audio.wrongStep.play();
     return this.dialog.open(CustomAlertDialogComponent, {
       data: {
         mainContent: message,
@@ -228,6 +233,7 @@ export class AppComponent implements AfterViewInit {
   }
   private gameOver(redo: boolean) {
     this.stopTimer();
+    this.audio.gameOver.play();
     if (redo) {
       const popupRef = this.raisePopup('You almost got it! But, there is a better solution with fewer steps \n' +
         ' I hope you like challenges! :)', ['Let\'s do it again', 'That\'s all I got! Next level', 'Quit']);
