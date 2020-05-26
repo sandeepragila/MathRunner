@@ -25,9 +25,7 @@ export class AppComponent implements AfterViewInit {
   startGame = false;
   path: Array<Step> = [];
   timer;
-  timeLeft = 30;
-  bestTimes: Map<number, number> = new Map();
-  retries: Map<number, number> = new Map();
+  timeLeft;
   gameSummaryInfo: Map<number, GameSummaryInfo> = new Map();
   constructor(
     private dialog: MatDialog,
@@ -35,30 +33,33 @@ export class AppComponent implements AfterViewInit {
   ) {
   }
   private startTimer() {
-    this.timeLeft = 30;
+    this.timeLeft = this.currLevelInfo.timeLimit;
     this.timer = setInterval(() => {
       if (this.timeLeft > 0) {
         this.timeLeft--;
       } else {
-        this.timeLeft = 30;
+        this.stopTimer();
+        const ref = this.raisePopup('Oops! Time up!! :(', ['Retry']);
+        ref.afterClosed().subscribe(result => {
+          this.loadNextLevel(this.currLevelNumber);
+        });
       }
     }, 1000)
   }
   private stopTimer() {
     clearInterval(this.timer);
     this.storeInfo();
-    this.bestTimes.set((this.currLevelNumber + 1), 30 - this.timeLeft);
   }
   private storeInfo() {
     const level = this.currLevelNumber + 1;
     if (this.gameSummaryInfo.has(level)) {
       const info: GameSummaryInfo = this.gameSummaryInfo.get(level);
-      info.time = 30 - this.timeLeft;
+      info.time = this.currLevelInfo.timeLimit - this.timeLeft;
       info.retries += 1;
       info.isShortest = this.path.length === this.currLevelInfo.shortestPath;
     } else {
       const info: GameSummaryInfo = new GameSummaryInfo(level);
-      info.time = 30 - this.timeLeft;
+      info.time = this.currLevelInfo.timeLimit - this.timeLeft;
       info.isShortest = this.path.length === this.currLevelInfo.shortestPath;
       this.gameSummaryInfo.set(level, info);
     }
@@ -90,7 +91,7 @@ export class AppComponent implements AfterViewInit {
   private checkGameOver(level: number): boolean {
     if (level === GameConstants.GameLevels.length) {
       const ref =  this.dialog.open(GameSummaryAlertComponent, {
-        data:  {
+        data: {
           gameSummaryInfo: this.gameSummaryInfo
         }
       });
@@ -108,11 +109,25 @@ export class AppComponent implements AfterViewInit {
     }
     const target = event.target || event.srcElement || event.currentTarget;
     const index = Number(target.parentElement.dataset.index);
+    if ((index + 1) === this.currLevelInfo.matrix.length) {
+      target.style.background = '#ce4e4e';
+      if (this.result === this.currLevelInfo.solution) {
+        if (this.path.length === this.currLevelInfo.shortestPath) {
+          this.gameOver(false);
+        } else {
+          this.gameOver(true);
+        }
+      } else  {
+        const ref = this.raisePopup('Did you cover ' + this.currLevelInfo.solution + ' miles before you get here? Go back!');
+        ref.afterClosed().subscribe(result => {
+          target.style.background = 'lightblue';
+        })
+      }
+      return;
+    }
     const row = Math.floor((index / this.currLevelInfo.cols));
     const col = index % this.currLevelInfo.cols;
-    const step = new Step(row, col,  Number(target.textContent));
-    console.log('got it' + target);
-    console.log('row - ' + row + ' col - ' + col);
+    const step = new Step(row, col,  index === 0 ? this.currLevelInfo.matrix[0] : Number(target.textContent));
     if (!this.validate(step)) {
       return;
     }
@@ -124,13 +139,6 @@ export class AppComponent implements AfterViewInit {
         return;
       }
       target.style.background = '#ce4e4e';
-      if (this.result === this.currLevelInfo.solution) {
-        if (this.path.length === this.currLevelInfo.shortestPath) {
-          this.gameOver(false);
-        } else {
-          this.gameOver(true);
-        }
-      }
     } else {
       target.style.background = 'lightblue';
     }
@@ -179,7 +187,6 @@ export class AppComponent implements AfterViewInit {
     });
 
     document.body.addEventListener('mouseup', ev => {
-      console.log('mouse up');
       this.isMouseDown = false;
     });
   }
@@ -195,7 +202,7 @@ export class AppComponent implements AfterViewInit {
   }
   private validate(step: Step): boolean {
     if (this.path.length === 0 && (step.row !== 0 || step.col !== 0)) {
-      this.raisePopup('Don\'t try to be over smart! You can only start from the first cell!');
+      this.raisePopup('Aahaa! You can only start from the first cell!');
       return false;
     }
     if (this.path.length === 0) {
@@ -222,7 +229,7 @@ export class AppComponent implements AfterViewInit {
   private gameOver(redo: boolean) {
     this.stopTimer();
     if (redo) {
-      const popupRef = this.raisePopup('Is that all you got? There is a better solution with fewer steps \n' +
+      const popupRef = this.raisePopup('You almost got it! But, there is a better solution with fewer steps \n' +
         ' I hope you like challenges! :)', ['Let\'s do it again', 'That\'s all I got! Next level', 'Quit']);
       popupRef.afterClosed().subscribe(result => {
         if (result === 'Let\'s do it again') {
@@ -245,7 +252,6 @@ export class AppComponent implements AfterViewInit {
     }
     const dialogRef = this.dialog.open(GameOverAlertComponent);
     dialogRef.afterClosed().subscribe(result => {
-      console.log('result is ' + result);
       if (result === 'Let\'s Go!') {
         this.loadNextLevel(this.currLevelNumber);
       } else {

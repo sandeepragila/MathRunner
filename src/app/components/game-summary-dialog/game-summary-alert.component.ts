@@ -12,6 +12,7 @@ export class GameSummaryAlertComponent {
   constructor(
     @Inject(MAT_DIALOG_DATA) private data: any,
     private dialogRef: MatDialogRef<GameSummaryAlertComponent>) {
+    this.dialogRef.disableClose = true;
     this.gameSummaryInfo = data.gameSummaryInfo;
   }
 }

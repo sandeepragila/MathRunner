@@ -1,17 +1,25 @@
-<div style="text-align:center; font-family: cursive; color: #000042;">
+<div style="text-align:center; font-family: 'Chelsea Market'; color: #000042;">
   <h1>
     Welcome to {{ title }}!
   </h1>
 </div>
 <div style="text-align: center; color: brown">
-  <h2>Timer: {{timeLeft}}</h2>
+  <h2>Level: {{currLevelNumber + 1}} Timer: {{timeLeft}}</h2>
 </div>
 <div id="mygrid" *ngIf="display" class="divElement" style="-webkit-user-select: none;user-select: none;">
-  Result = {{result}}
+  <div style="text-align: center; color: brown">
+    <h2>Miles to reach me: {{currLevelInfo.solution}}</h2>
+  </div>
+  <div style="text-align: center;">
+    Result = {{result}}
+  </div>
   <mat-grid-list cols="{{currLevelInfo.cols}}" rowHeight="2:1">
-    <mat-grid-tile *ngFor="let num of currLevelInfo.matrix; let i = index" [attr.data-index]="i"
+    <mat-grid-tile *ngFor="let num of currLevelInfo.matrix; let i = index; let last = last; let first = first;" [attr.data-index]="i"
                    (mousedown)="myChangeEvent($event, true)" (mouseover)="myChangeEvent($event, false)">
-      {{ num }}
+      <span *ngIf="first" class="startHere">Start Here!</span>
+      <span *ngIf="!last" style="pointer-events: none"> {{ num }} </span>
+      <img *ngIf="last" src="assets/images/princess-t.png"
+           alt="Miles to reach me: {{currLevelInfo.solution}}" style="object-fit: cover; pointer-events: none; height: inherit; width: inherit;">
     </mat-grid-tile>
   </mat-grid-list>
 </div>

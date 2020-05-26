@@ -1,6 +1,9 @@
 li {
   list-style-type: square;
   font-size: larger;
-  font-family: cursive;
+  font-family: "Chelsea Market";
   color: brown;
+}
+.chelsea {
+  font-family: "Chelsea Market", sans-serif;
 }

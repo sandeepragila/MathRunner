@@ -13,6 +13,7 @@ export class CustomAlertDialogComponent {
   constructor(
     @Inject(MAT_DIALOG_DATA) private data: any,
     private dialogRef: MatDialogRef<CustomAlertDialogComponent>) {
+    dialogRef.disableClose = true;
     if (data) {
       this.mainContent = data.mainContent || this.mainContent;
       if (data.buttons) {

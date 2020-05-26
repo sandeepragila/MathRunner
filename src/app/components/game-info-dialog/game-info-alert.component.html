@@ -1,33 +1,35 @@
-<mat-dialog-content style="text-align: center; font-family: cursive">
-  <mat-card>
-  <mat-card-header><h1 style="color: #000042">Math Runner</h1></mat-card-header>
-  <mat-card-title><h2 style="color: #000042">Welcome to the game!
+<mat-dialog-content style="text-align: center;" class="chelsea">
+  <h1 style="color: #000042;">Math Runner</h1>
+  <h2 style="color: #000042;">Welcome to the game!
     The game tests your math computing ability. You will be shown a grid and imagine you are on the first cell(top left) and
     your princess is in the last cell (bottom right). You want to get there with as fewer steps as possible.
     But, you need to follow some simple rules below</h2>
-  </mat-card-title>
-  <ul style="text-align: justify; padding-left: 23%;">
+  <ul style="text-align: justify;">
     <li>
-      Each block represents a number that you can think the number of miles it takes to complete the block.
+      Each block represents number of miles.
     </li>
     <li>
-      You can only go to the right, down or right+down(diagonal) at any point
+      Last block (princess) is where you need to land at the end by covering the exact number of miles displayed
+      above the grid.
     </li>
     <li>
-      You can come back in the same way to undo a step
+      You can only go to the right, down or right+down (diagonal) at any point.
     </li>
     <li>
-      When you go right or down you add the number of miles on that block
+      You can come back in the same way to undo a step.
     </li>
     <li>
-      When you go right down which is diagonal then you multiply the miles on that block
+      When you go right or down you ADD the total miles you have travelled so far with the miles on that block.
     </li>
     <li>
-      Remember there will be lot of ways but we want the shortest path.
+      When you go right+down which is diagonal then you MULTIPLY total miles you have travelled so far
+      with the miles on that block.
+    </li>
+    <li>
+      Remember there will be a lot of ways but we want the shortest path (using fewer number of blocks).
     </li>
   </ul>
   <p style="color: #000042; font-size: larger">Go get your princess!</p>
-  </mat-card>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-raised-button matDialogClose="Let's Go" style="color: #000042;">

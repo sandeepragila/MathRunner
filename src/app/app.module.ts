@@ -13,6 +13,7 @@ import {CustomAlertDialogComponent} from './components/custom-alert-dialog/custo
 import {GameSummaryAlertComponent} from './components/game-summary-dialog/game-summary-alert.component';
 import {GameInfoAlertComponent} from './components/game-info-dialog/game-info-alert.component';
 import {MatCardModule} from '@angular/material/card';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   exports: [
@@ -31,6 +32,7 @@ export class MaterialModule { }
     GameInfoAlertComponent
   ],
   imports: [
+    NgbModule,
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,
