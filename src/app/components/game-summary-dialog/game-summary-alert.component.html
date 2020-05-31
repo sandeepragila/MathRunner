@@ -4,7 +4,7 @@
 <ul style="text-align: justify;">
   <li *ngFor="let entry of gameSummaryInfo | keyvalue">
     <div [ngStyle]="{'color':entry.value.isShortest ? 'green': 'grey'}">
-      Level: {{entry.key}} -------- Best Time: {{entry.value.time}} secs -------- Retries: {{entry.value.retries}}
+      Level: {{entry.key}} -------- Retries: {{entry.value.retries}}
     </div>
   </li>
 </ul>

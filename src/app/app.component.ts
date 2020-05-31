@@ -1,5 +1,4 @@
 import {AfterViewInit, ChangeDetectorRef, Component} from '@angular/core';
-import {FormBuilder, FormGroup} from '@angular/forms';
 import {ThemePalette} from '@angular/material/core';
 import {MatDialog} from '@angular/material/dialog';
 import {GameOverAlertComponent} from './components/game-over-alert-dialog/game-over-alert.component';
@@ -8,6 +7,8 @@ import {GameConstants, GameSummaryInfo, LevelInfo} from './GameConstants';
 import {GameSummaryAlertComponent} from './components/game-summary-dialog/game-summary-alert.component';
 import {GameInfoAlertComponent} from './components/game-info-dialog/game-info-alert.component';
 import {AudioService} from './audio/audio.service';
+import {GameDifficulty, LevelGeneratorService} from './service/level-generator.service';
+import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
 
 @Component({
   selector: 'app-root',
@@ -21,21 +22,35 @@ export class AppComponent implements AfterViewInit {
   prevResult: any;
   colors: ThemePalette[] = ['primary', 'accent', 'warn'];
   currLevelInfo: LevelInfo;
-  currLevelNumber = 0;
+  prevLevelInfo: LevelInfo;
+  currLevelNumber = 2;
   display = false;
   startGame = false;
   path: Array<Step> = [];
   timer;
   timeLeft;
   gameSummaryInfo: Map<number, GameSummaryInfo> = new Map();
+  gameModes = [
+    {id: 'EASY', name: 'EASY'},
+    {id: 'MEDIUM', name: 'MEDIUM'},
+    {id: 'HARD', name: 'HARD'}
+  ];
+  gameDifficulty = this.gameModes[0];
+  modeForm: FormGroup;
+
   constructor(
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef,
-    public audio: AudioService
+    public audio: AudioService,
+    public levelGenerator: LevelGeneratorService,
+    private fb: FormBuilder
   ) {
+    this.modeForm = fb.group({
+      gameMode: [this.gameDifficulty]
+    });
   }
+
   private startTimer() {
-    this.audio.bg.play();
     this.timeLeft = this.currLevelInfo.timeLimit;
     this.timer = setInterval(() => {
       if (this.timeLeft > 0) {
@@ -49,10 +64,12 @@ export class AppComponent implements AfterViewInit {
       }
     }, 1000)
   }
+
   private stopTimer() {
     clearInterval(this.timer);
     this.storeInfo();
   }
+
   private storeInfo() {
     const level = this.currLevelNumber + 1;
     if (this.gameSummaryInfo.has(level)) {
@@ -67,16 +84,20 @@ export class AppComponent implements AfterViewInit {
       this.gameSummaryInfo.set(level, info);
     }
   }
+
   ngAfterViewInit(): void {
     this.dialog.open(GameInfoAlertComponent).afterClosed().subscribe(result => {
     this.currLevelInfo = GameConstants.getGameLevel(this.currLevelNumber);
+    this.prevLevelInfo = this.currLevelInfo;
     this.display = true;
     this.cdr.detectChanges();
     this.addMatrixListeners();
     this.startGame = true;
-    this.startTimer();
+    this.audio.bg.play();
+    // this.startTimer();
     })
   }
+
   private loadNextLevel(level: number) {
     this.path = [];
     this.startGame = false;
@@ -84,26 +105,59 @@ export class AppComponent implements AfterViewInit {
     this.result = 0;
     this.currLevelInfo = undefined;
     this.cdr.detectChanges();
-    this.currLevelInfo = GameConstants.getGameLevel(level);
+    this.currLevelInfo = this.getCorrectLevel(level);
+    this.currLevelNumber = level;
     this.display = true;
     this.cdr.detectChanges();
     this.addMatrixListeners();
     this.startGame = true;
-    this.startTimer();
+    this.audio.bg.play();
+    // this.startTimer();
   }
+
+  private getCorrectLevel(level: number): LevelInfo {
+    if (level !== this.currLevelNumber) {
+      this.prevLevelInfo = this.levelGenerator.getNextLevel(this.getAsEnum());
+    }
+    return this.prevLevelInfo;
+  }
+
+  private onDifficultyChange(event) {
+    if (this.gameDifficulty.name === 'EASY' && event.value.name !== 'EASY'  && (this.currLevelNumber + 1) <= 7) {
+      this.modeForm.controls['gameMode'].patchValue(this.gameModes[0]);
+      this.raisePopup('In a hurry? You need to complete at least 7 levels to switch to next difficulty');
+      return;
+    }
+    if (this.gameDifficulty.name === 'MEDIUM' && event.value.name === 'HARD' && (this.currLevelNumber + 1) <= 14) {
+      this.modeForm.controls['gameMode'].patchValue(this.gameModes[1]);
+      this.raisePopup('In a hurry? Reach at least level 14 to switch to next difficulty');
+      return;
+    }
+    this.gameDifficulty = event.value;
+  }
+
+  private getAsEnum(): GameDifficulty {
+   const key = this.gameDifficulty.name as keyof typeof GameDifficulty;
+   return GameDifficulty[key];
+  }
+
   private checkGameOver(level: number): boolean {
     if (level === GameConstants.GameLevels.length) {
-      const ref =  this.dialog.open(GameSummaryAlertComponent, {
-        data: {
-          gameSummaryInfo: this.gameSummaryInfo
-        }
-      });
-      ref.afterClosed().subscribe(result => {
-        window.location.reload();
-      });
+      this.triggerGameOver();
       return true;
     }
     return false;
+  }
+
+  private triggerGameOver() {
+    const ref =  this.dialog.open(GameSummaryAlertComponent, {
+      data: {
+        gameSummaryInfo: this.gameSummaryInfo
+      }
+    });
+    ref.afterClosed().subscribe(result => {
+      window.location.reload();
+    });
   }
 
   public highlight(event) {
@@ -147,6 +201,7 @@ export class AppComponent implements AfterViewInit {
       target.style.background = 'lightblue';
     }
   }
+
   private calcResult(step: Step) {
     if (this.path.length === 0) {
       this.path.push(step);
@@ -163,6 +218,7 @@ export class AppComponent implements AfterViewInit {
       this.incrResult(lastStep, step);
     }
   }
+
   private incrResult(lastStep: Step, step: Step) {
     if (lastStep === undefined) {
       this.result = step.val;
@@ -174,6 +230,7 @@ export class AppComponent implements AfterViewInit {
       this.result *= step.val;
     }
   }
+
   private decrResult(lastStep: Step, step: Step) {
     if (lastStep === undefined) {
       this.result = 0;
@@ -185,6 +242,7 @@ export class AppComponent implements AfterViewInit {
       this.result /= step.val;
     }
   }
+
   private addMatrixListeners() {
     document.querySelectorAll('mat-grid-tile').forEach(item => {
       item.setAttribute('style', 'background: lightblue');
@@ -194,6 +252,7 @@ export class AppComponent implements AfterViewInit {
       this.isMouseDown = false;
     });
   }
+
   public myChangeEvent(event, down: boolean) {
     if (down) {
       this.isMouseDown = true;
@@ -204,6 +263,7 @@ export class AppComponent implements AfterViewInit {
       }
     }
   }
+
   private validate(step: Step): boolean {
     if (this.path.length === 0 && (step.row !== 0 || step.col !== 0)) {
       this.raisePopup('Aahaa! You can only start from the first cell!');
@@ -222,6 +282,7 @@ export class AppComponent implements AfterViewInit {
     this.raisePopup('Wrong step! Please follow the rules');
     return false;
   }
+
   private raisePopup(message: string, buttons?: any) {
     this.audio.wrongStep.play();
     return this.dialog.open(CustomAlertDialogComponent, {
@@ -231,8 +292,10 @@ export class AppComponent implements AfterViewInit {
       }
     })
   }
+
   private gameOver(redo: boolean) {
-    this.stopTimer();
+    // this.stopTimer();
+    this.storeInfo();
     this.audio.gameOver.play();
     if (redo) {
       const popupRef = this.raisePopup('You almost got it! But, there is a better solution with fewer steps \n' +
@@ -241,28 +304,20 @@ export class AppComponent implements AfterViewInit {
         if (result === 'Let\'s do it again') {
           this.loadNextLevel(this.currLevelNumber);
         } else if (result === 'Quit') {
-          this.currLevelNumber = GameConstants.GameLevels.length;
-          this.checkGameOver(this.currLevelNumber);
+          this.triggerGameOver();
         } else {
-          if (this.checkGameOver(++this.currLevelNumber)) {
-            return;
-          }
-          this.loadNextLevel(this.currLevelNumber);
+          this.loadNextLevel(this.currLevelNumber + 1);
         }
       })
       return;
     }
-    ++this.currLevelNumber
-    if (this.checkGameOver(this.currLevelNumber)) {
-      return;
-    }
+
     const dialogRef = this.dialog.open(GameOverAlertComponent);
     dialogRef.afterClosed().subscribe(result => {
       if (result === 'Let\'s Go!') {
-        this.loadNextLevel(this.currLevelNumber);
+        this.loadNextLevel(this.currLevelNumber + 1);
       } else {
-        this.currLevelNumber = GameConstants.GameLevels.length;
-        this.checkGameOver(this.currLevelNumber);
+        this.triggerGameOver();
       }
     })
   }

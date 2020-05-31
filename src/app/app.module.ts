@@ -15,6 +15,7 @@ import {GameInfoAlertComponent} from './components/game-info-dialog/game-info-al
 import {MatCardModule} from '@angular/material/card';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {AudioService} from './audio/audio.service';
+import {LevelGeneratorService} from './service/level-generator.service';
 
 @NgModule({
   exports: [
@@ -43,7 +44,7 @@ export class MaterialModule { }
     ReactiveFormsModule,
   ],
   entryComponents: [GameInfoAlertComponent, GameOverAlertComponent, CustomAlertDialogComponent, GameSummaryAlertComponent],
-  providers: [AudioService],
+  providers: [AudioService, LevelGeneratorService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

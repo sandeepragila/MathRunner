@@ -22,3 +22,15 @@ mat-grid-tile {
   font-family: Chelsea Market;
   font-size: smaller;
 }
+
+/deep/ .mat-select{
+  color: brown;
+}
+
+/deep/ .mat-select-placeholder {
+  color: brown;
+}
+
+/deep/ .mat-form-field-type-mat-select .mat-form-field-label, .mat-select-value {
+  color: brown;
+}

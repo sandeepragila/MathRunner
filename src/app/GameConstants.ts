@@ -84,7 +84,7 @@ export class GameSummaryInfo {
   private _isShortest: boolean;
   constructor(level: number) {
     this._level = level;
-    this._retries = 1;
+    this._retries = 0;
   }
 
   get level(): number {
