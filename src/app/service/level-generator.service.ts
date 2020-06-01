@@ -21,7 +21,6 @@ export class LevelGeneratorService {
 
   public getLevel(rowSize: number, colSize: number): LevelInfo {
     const maxAllowedResult = this.getRandomInt(0, (Math.max(rowSize, colSize) * 10), 30);
-    console.log('allowed max result: ' + maxAllowedResult);
     const grid: Block[][] = [];
 
     for (let i = 0; i < rowSize; i++) {
@@ -80,10 +79,6 @@ export class LevelGeneratorService {
         }
       }
     }
-    for (let i = 0; i < rows; i++) {
-      console.log(grid[i].toString());
-    }
-    console.log('solution: ' + grid[rows - 1][cols - 1].val + ' len: ' +  grid[rows - 1][cols - 1].pathLen);
   }
 
   private pickRandomResult(row, col, grid) {

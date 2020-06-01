@@ -7,3 +7,28 @@ li {
 .chelsea {
   font-family: "Chelsea Market", sans-serif;
 }
+
+.swipe-box {
+  display: block;
+  width: 100%;
+  float: left;
+  margin: 0;
+  transform: .5s ease .1s;
+}
+
+.ctn {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.inner-ctn {
+  margin: 20px;
+}
+
+.visible {
+  display: block;
+}
+
+.hidden {
+  display: none;
+}
