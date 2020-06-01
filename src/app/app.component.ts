@@ -37,6 +37,7 @@ export class AppComponent implements AfterViewInit {
   ];
   gameDifficulty = this.gameModes[0];
   modeForm: FormGroup;
+  modeValidator: Map<string, number> = new Map();
 
   constructor(
     private dialog: MatDialog,
@@ -89,6 +90,7 @@ export class AppComponent implements AfterViewInit {
     this.dialog.open(GameInfoAlertComponent).afterClosed().subscribe(result => {
     this.currLevelInfo = GameConstants.getGameLevel(this.currLevelNumber);
     this.prevLevelInfo = this.currLevelInfo;
+    this.modeValidator.set(this.gameDifficulty.name, 1);
     this.display = true;
     this.cdr.detectChanges();
     this.addMatrixListeners();
@@ -116,19 +118,28 @@ export class AppComponent implements AfterViewInit {
   }
 
   private getCorrectLevel(level: number): LevelInfo {
+    const mode = this.gameDifficulty.name;
     if (level !== this.currLevelNumber) {
       this.prevLevelInfo = this.levelGenerator.getNextLevel(this.getAsEnum());
+      if (this.modeValidator.has(mode)) {
+        this.modeValidator.set(mode, this.modeValidator.get(mode) + 1);
+      } else {
+        this.modeValidator.set(mode, 1);
+      }
     }
+    this.modeValidator.set(this.gameDifficulty.name, level);
     return this.prevLevelInfo;
   }
 
-  private onDifficultyChange(event) {
-    if (this.gameDifficulty.name === 'EASY' && event.value.name !== 'EASY'  && (this.currLevelNumber + 1) <= 7) {
+  public onDifficultyChange(event) {
+    if (this.gameDifficulty.name === 'EASY' && event.value.name !== 'EASY'  &&
+      this.modeValidator.get(this.gameDifficulty.name) <= 7) {
       this.modeForm.controls['gameMode'].patchValue(this.gameModes[0]);
-      this.raisePopup('In a hurry? You need to complete at least 7 levels to switch to next difficulty');
+      this.raisePopup('In a hurry? You need to complete at least 7 EASY levels to switch to next difficulty');
       return;
     }
-    if (this.gameDifficulty.name === 'MEDIUM' && event.value.name === 'HARD' && (this.currLevelNumber + 1) <= 14) {
+    if (this.gameDifficulty.name === 'MEDIUM' && event.value.name === 'HARD' &&
+      this.modeValidator.get(this.gameDifficulty.name) <= 7) {
       this.modeForm.controls['gameMode'].patchValue(this.gameModes[1]);
       this.raisePopup('In a hurry? Reach at least level 14 to switch to next difficulty');
       return;
