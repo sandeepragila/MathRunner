@@ -9,6 +9,7 @@ import {GameInfoAlertComponent} from './components/game-info-dialog/game-info-al
 import {AudioService} from './audio/audio.service';
 import {GameDifficulty, LevelGeneratorService} from './service/level-generator.service';
 import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
+import 'hammerjs';
 
 @Component({
   selector: 'app-root',
@@ -23,7 +24,7 @@ export class AppComponent implements AfterViewInit {
   colors: ThemePalette[] = ['primary', 'accent', 'warn'];
   currLevelInfo: LevelInfo;
   prevLevelInfo: LevelInfo;
-  currLevelNumber = 2;
+  currLevelNumber = 0;
   display = false;
   startGame = false;
   path: Array<Step> = [];
@@ -122,18 +123,24 @@ export class AppComponent implements AfterViewInit {
     return this.prevLevelInfo;
   }
 
-  private onDifficultyChange(event) {
+  public onDifficultyChange(event) {
     if (this.gameDifficulty.name === 'EASY' && event.value.name !== 'EASY'  && (this.currLevelNumber + 1) <= 7) {
       this.modeForm.controls['gameMode'].patchValue(this.gameModes[0]);
-      this.raisePopup('In a hurry? You need to complete at least 7 levels to switch to next difficulty');
+      this.raisePopup('In a hurry? You need to complete at least 7 EASY levels to switch to ' + event.value.name + ' difficulty');
+      return;
+    }
+    if (this.gameDifficulty.name === 'EASY' && event.value.name === 'HARD' ) {
+      this.modeForm.controls['gameMode'].patchValue(this.gameModes[0]);
+      this.raisePopup('In a hurry? You need to complete at least 7 MEDIUM levels to switch to HARD difficulty');
       return;
     }
     if (this.gameDifficulty.name === 'MEDIUM' && event.value.name === 'HARD' && (this.currLevelNumber + 1) <= 14) {
       this.modeForm.controls['gameMode'].patchValue(this.gameModes[1]);
-      this.raisePopup('In a hurry? Reach at least level 14 to switch to next difficulty');
+      this.raisePopup('In a hurry? You need to complete at least 7 MEDIUM levels to switch to HARD difficulty');
       return;
     }
     this.gameDifficulty = event.value;
+    this.raisePopup('You earned it! Your next level difficulty is set to ' + this.gameDifficulty.name);
   }
 
   private getAsEnum(): GameDifficulty {

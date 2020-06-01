@@ -1,38 +1,20 @@
 <mat-dialog-content style="text-align: center;" class="chelsea">
   <h1 style="color: #000042;">Math Runner</h1>
+  <div *ngIf="toggle">
   <h2 style="color: #000042;">Welcome to the game!
     The game tests your math computing ability. You will be shown a grid and imagine you are on the first cell(top left) and
     your princess is in the last cell (bottom right). You want to get there with as fewer steps as possible.
-    But, you need to follow some simple rules below</h2>
-  <ul style="text-align: justify;">
-    <li>
-      Each block represents number of miles.
-    </li>
-    <li>
-      Last block (princess) is where you need to land at the end by covering the exact number of miles displayed
-      above the grid.
-    </li>
-    <li>
-      You can only go to the right, down or right+down (diagonal) at any point.
-    </li>
-    <li>
-      You can come back in the same way to undo a step.
-    </li>
-    <li>
-      When you go right or down you ADD the total miles you have travelled so far with the miles on that block.
-    </li>
-    <li>
-      When you go right+down which is diagonal then you MULTIPLY total miles you have travelled so far
-      with the miles on that block.
-    </li>
-    <li>
-      Remember there will be a lot of ways but we want the shortest path (using fewer number of blocks).
-    </li>
-  </ul>
-  <p style="color: #000042; font-size: larger">Go get your princess!</p>
+    But, you need to follow some simple rules. Click next to see the instructions.</h2>
+  </div>
+  <div *ngIf="!toggle">
+    <div class="image">
+      <img *ngIf="!toggle" style="pointer-events: none;width: 500px;" [src]="currImage.image" [alt]="currImage.id">
+    </div>
+  </div>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-raised-button matDialogClose="Let's Go" style="color: #000042;">
-    Let's Go
+  <button mat-raised-button *ngFor="let button of buttons;" [id]="button.id"
+         (click)="onClick($event)" style="color: #287b26;">
+    {{button.name}}
   </button>
 </mat-dialog-actions>

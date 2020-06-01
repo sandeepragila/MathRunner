@@ -1,5 +1,5 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import {BrowserModule, HAMMER_GESTURE_CONFIG, HammerGestureConfig} from '@angular/platform-browser';
+import {Injectable, NgModule} from '@angular/core';
 
 import { AppComponent } from './app.component';
 import {DemoMaterialModule} from './material-module';
@@ -25,6 +25,13 @@ import {LevelGeneratorService} from './service/level-generator.service';
 })
 export class MaterialModule { }
 
+@Injectable()
+export class MyHammerConfig extends HammerGestureConfig  {
+  overrides = <any>{
+    'swipe': {velocity: 0.4, threshold: 20} // override default settings
+  }
+}
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -44,7 +51,10 @@ export class MaterialModule { }
     ReactiveFormsModule,
   ],
   entryComponents: [GameInfoAlertComponent, GameOverAlertComponent, CustomAlertDialogComponent, GameSummaryAlertComponent],
-  providers: [AudioService, LevelGeneratorService],
+  providers: [AudioService, LevelGeneratorService, {
+    provide: HAMMER_GESTURE_CONFIG,
+    useClass: MyHammerConfig
+  }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
