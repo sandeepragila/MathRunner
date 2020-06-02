@@ -85,4 +85,8 @@ export class GameInfoAlertComponent {
       this.buttons = [this.backButton, this.goButton];
     }
   }
+
+  public get width() {
+    return window.innerWidth;
+  }
 }

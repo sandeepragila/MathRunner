@@ -1,5 +1,5 @@
 <mat-dialog-content style="text-align: center;" class="chelsea">
-  <h1 style="color: #000042;">Math Runner</h1>
+  <h1 style="color: #000042;">Math Runner <img class="logo" src="assets/images/logo.png"> </h1>
   <div *ngIf="toggle">
   <h2 style="color: #000042;">Welcome to the game!
     The game tests your math computing ability. You will be shown a grid and imagine you are on the first cell(top left) and
@@ -8,7 +8,8 @@
   </div>
   <div *ngIf="!toggle">
     <div class="image">
-      <img *ngIf="!toggle" style="pointer-events: none;width: 500px;" [src]="currImage.image" [alt]="currImage.id">
+      <img *ngIf="!toggle" [ngClass]="{ 'desktop-view': width >= 768, 'mobile-view': width < 768
+}"[src]="currImage.image" [alt]="currImage.id">
     </div>
   </div>
 </mat-dialog-content>

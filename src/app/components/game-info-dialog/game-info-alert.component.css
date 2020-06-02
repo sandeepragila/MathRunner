@@ -32,3 +32,17 @@ li {
 .hidden {
   display: none;
 }
+
+.desktop-view {
+  pointer-events: none;
+  max-width: 500px;
+}
+
+.mobile-view {
+  pointer-events: none;
+  max-width: 250px;
+}
+.logo {
+  height: 7rem;
+  width: 7rem;
+}

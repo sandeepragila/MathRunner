@@ -34,3 +34,8 @@ mat-grid-tile {
 /deep/ .mat-form-field-type-mat-select .mat-form-field-label, .mat-select-value {
   color: brown;
 }
+
+.logo {
+  height: 7rem;
+  width: 7rem;
+}

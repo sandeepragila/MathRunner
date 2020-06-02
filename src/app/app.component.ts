@@ -128,30 +128,31 @@ export class AppComponent implements AfterViewInit {
         this.modeValidator.set(mode, 1);
       }
     }
-    this.modeValidator.set(this.gameDifficulty.name, level);
     return this.prevLevelInfo;
   }
 
   public onDifficultyChange(event) {
-    if (this.gameDifficulty.name === 'EASY' && event.value.name !== 'EASY'  &&
-      this.modeValidator.get(this.gameDifficulty.name) <= 7) {
-      this.modeForm.controls['gameMode'].patchValue(this.gameModes[0]);
-      this.raisePopup('In a hurry? You need to complete at least 7 EASY levels to switch to ' + event.value.name + ' difficulty');
-      return;
+    if (event.value.name === 'EASY') {
+      this.raisePopup('Your next level difficulty is set to EASY');
     }
-    if (this.gameDifficulty.name === 'EASY' && event.value.name === 'HARD' ) {
-      this.modeForm.controls['gameMode'].patchValue(this.gameModes[0]);
-      this.raisePopup('In a hurry? You need to complete at least 7 MEDIUM levels to switch to HARD difficulty');
-      return;
+    if (event.value.name === 'MEDIUM') {
+      if (this.modeValidator.has('EASY') && this.modeValidator.get('EASY') >= 7) {
+        this.gameDifficulty = event.value;
+        this.raisePopup('You earned it! Your next level difficulty is set to ' + this.gameDifficulty.name);
+      } else {
+        this.modeForm.controls['gameMode'].patchValue(this.gameDifficulty);
+        this.raisePopup('In a hurry? You need to complete at least 7 EASY levels to switch to MEDIUM difficulty');
+      }
     }
-    if (this.gameDifficulty.name === 'MEDIUM' && event.value.name === 'HARD' &&
-      this.modeValidator.get(this.gameDifficulty.name) <= 7) {
-      this.modeForm.controls['gameMode'].patchValue(this.gameModes[1]);
-      this.raisePopup('In a hurry? You need to complete at least 7 MEDIUM levels to switch to HARD difficulty');
-      return;
+    if (event.value.name === 'HARD') {
+      if (this.modeValidator.has('MEDIUM') && this.modeValidator.get('MEDIUM') >= 7) {
+        this.gameDifficulty = event.value;
+        this.raisePopup('You earned it! Your next level difficulty is set to ' + this.gameDifficulty.name);
+      } else {
+        this.modeForm.controls['gameMode'].patchValue(this.gameDifficulty);
+        this.raisePopup('In a hurry? You need to complete at least 7 ' + this.gameDifficulty.name + ' levels to switch to HARD difficulty');
+      }
     }
-    this.gameDifficulty = event.value;
-    this.raisePopup('You earned it! Your next level difficulty is set to ' + this.gameDifficulty.name);
   }
 
   private getAsEnum(): GameDifficulty {

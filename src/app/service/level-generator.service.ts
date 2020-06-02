@@ -33,8 +33,19 @@ export class LevelGeneratorService {
 
     this.findMinPathToPrincess(grid, maxAllowedResult);
     const princessBlock = grid[rowSize - 1][colSize - 1];
-    const levelInfo = new LevelInfo(this.getAsFlatArray(grid), colSize, princessBlock.val, princessBlock.pathLen, 60);
+    const finalMinDistance = this.findFinalSolution(grid, rowSize, colSize, princessBlock.val);
+
+    const levelInfo = new LevelInfo(this.getAsFlatArray(grid), colSize, princessBlock.val,
+      Math.min(princessBlock.pathLen, finalMinDistance), 60);
     return levelInfo;
+  }
+
+  private findFinalSolution(grid: Block[][], row, col, resultSum): number {
+    const finalMinDistance: number[] = [Number.MAX_SAFE_INTEGER];
+    this.recursiveMinPathFinder(grid, row - 1, col - 2, finalMinDistance, 1, resultSum);
+    this.recursiveMinPathFinder(grid, row - 2, col - 2, finalMinDistance, 1, resultSum);
+    this.recursiveMinPathFinder(grid, row - 2, col - 1, finalMinDistance, 1, resultSum);
+    return finalMinDistance[0];
   }
 
   private getAsFlatArray(grid: Block[][]) {
@@ -48,8 +59,52 @@ export class LevelGeneratorService {
   }
 
   /**
-   * Heuristic algorithm that tries to find a solution by assuming maxAllowedResult as threshold
-   * in finding the quickest route.
+   * Recursive algorithm to find the shortest path using a buttom-up approach. This
+   * is to ensure we have the shortest path as the heuristic algorithem only tries to
+   * find the most probable solution and not the best possible.
+   *
+   * @param grid input matrix
+   * @param row curr row index we are on
+   * @param col curr col index we are on
+   * @param finalMinDistance reference variable to store the final min distance
+   * @param currMinDistance current distance at each cell. local to its recursive run
+   * @param resultSum result sum which will be local to its recursive run
+   */
+  private recursiveMinPathFinder(grid: Block[][], row, col, finalMinDistance: number[],
+                                 currMinDistance, resultSum) {
+    if (row < 0 || col < 0 || currMinDistance > finalMinDistance[0]) {
+      return;
+    }
+
+    const currVal = grid[row][col].val;
+    if (row === 0 && col === 0) {
+      if (resultSum === currVal) {
+        finalMinDistance[0] = Math.min(finalMinDistance[0], currMinDistance);
+      }
+      return;
+    }
+
+    if (currVal > resultSum) {
+      return;
+    }
+
+    if ((resultSum % currVal) === 0  && (resultSum / currVal) > 0) {
+      this.recursiveMinPathFinder(grid, row - 1,
+        col - 1, finalMinDistance, currMinDistance + 1, resultSum / currVal);
+    }
+
+    if ((resultSum - currVal) > 0) {
+      this.recursiveMinPathFinder(grid, row - 1, col,
+        finalMinDistance, currMinDistance + 1, resultSum - currVal);
+      this.recursiveMinPathFinder(grid, row,
+        col - 1, finalMinDistance, currMinDistance + 1, resultSum - currVal);
+    }
+  }
+
+  /**
+   * Heuristic algorithm that tries to find most probable solution by assuming maxAllowedResult as threshold
+   * in finding the quickest route. This might not be the shortest yet but most probably it could be. This will
+   * generate the question by also finding the intermediate solution.
    *
    * @param grid - input grid to parse
    * @param maxAllowedResult - threshold for the end result
