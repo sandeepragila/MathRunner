@@ -15,4 +15,8 @@ export class GameSummaryAlertComponent {
     this.dialogRef.disableClose = true;
     this.gameSummaryInfo = data.gameSummaryInfo;
   }
+
+  onClick(event) {
+    window.location.reload();
+  }
 }

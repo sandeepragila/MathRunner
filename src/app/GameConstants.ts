@@ -15,7 +15,7 @@ export class GameConstants {
 
     const second = [2, 2, 4, 1, 4, 8];
     this.GameLevels.push(new LevelInfo(second, 3, 8, 2, 15));
-    const third = [4, 2, 4, 1 , 3, 4, 2, 2, 14];
+    const third = [4, 1, 3, 3 , 3, 4, 2, 3, 12];
     this.GameLevels.push(new LevelInfo(third, 3, 14, 3, 30));
     const fourth = [4, 3, 1, 4, 2, 4, 2, 4, 3, 1, 3, 32];
     this.GameLevels.push(new LevelInfo(fourth, 3, 32, 3, 30));

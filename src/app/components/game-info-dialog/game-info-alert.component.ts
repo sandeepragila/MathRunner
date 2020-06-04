@@ -46,6 +46,11 @@ export class GameInfoAlertComponent {
       image: 'assets/images/instruction-3.PNG',
       visible: false
     },
+    {
+      id: 4,
+      image: 'assets/images/instruction-4.PNG',
+      visible: false
+    },
   ]
   currImage = this.instructions[0];
   currIndex = -1;

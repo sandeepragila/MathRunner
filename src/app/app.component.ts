@@ -185,9 +185,18 @@ export class AppComponent implements AfterViewInit {
     }
     const target = event.target || event.srcElement || event.currentTarget;
     const index = Number(target.parentElement.dataset.index);
+    const row = Math.floor((index / this.currLevelInfo.cols));
+    const col = index % this.currLevelInfo.cols;
     if ((index + 1) === this.currLevelInfo.matrix.length) {
       target.style.background = '#ce4e4e';
       if (this.result === this.currLevelInfo.solution) {
+        if (!this.isValidPathToPrincess(new Step(row, col, 0))) {
+          const ref = this.raisePopup('Sorry no jumps allowed!');
+          ref.afterClosed().subscribe(result => {
+            target.style.background = 'lightblue';
+          })
+          return;
+        }
         if (this.path.length === this.currLevelInfo.shortestPath) {
           this.gameOver(false);
         } else {
@@ -201,10 +210,10 @@ export class AppComponent implements AfterViewInit {
       }
       return;
     }
-    const row = Math.floor((index / this.currLevelInfo.cols));
-    const col = index % this.currLevelInfo.cols;
+
     const step = new Step(row, col,  index === 0 ? this.currLevelInfo.matrix[0] : Number(target.textContent));
     if (!this.validate(step)) {
+      this.raisePopup('Wrong step! Please follow the rules');
       return;
     }
     this.audio.walk.play();
@@ -219,6 +228,10 @@ export class AppComponent implements AfterViewInit {
     } else {
       target.style.background = 'lightblue';
     }
+  }
+
+  private isValidPathToPrincess(step: Step): boolean {
+    return this.validate(step);
   }
 
   private calcResult(step: Step) {
@@ -298,7 +311,6 @@ export class AppComponent implements AfterViewInit {
     if (lastStep.isValidStep(step)) {
       return true;
     }
-    this.raisePopup('Wrong step! Please follow the rules');
     return false;
   }
 
