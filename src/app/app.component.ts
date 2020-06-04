@@ -133,6 +133,7 @@ export class AppComponent implements AfterViewInit {
 
   public onDifficultyChange(event) {
     if (event.value.name === 'EASY') {
+      this.gameDifficulty = event.value;
       this.raisePopup('Your next level difficulty is set to EASY');
     }
     if (event.value.name === 'MEDIUM') {
@@ -216,7 +217,9 @@ export class AppComponent implements AfterViewInit {
 
     const step = new Step(row, col,  index === 0 ? this.currLevelInfo.matrix[0] : Number(target.textContent));
     if (!this.validate(step)) {
-      this.raisePopup('Wrong step! Please follow the rules');
+      if (this.path.length !== 0) {
+        this.raisePopup('Wrong step! Please follow the rules');
+      }
       return;
     }
     this.audio.walk.play();
@@ -354,6 +357,10 @@ export class AppComponent implements AfterViewInit {
         this.triggerGameOver();
       }
     })
+  }
+
+  quitGame(event) {
+    this.triggerGameOver();
   }
 }
 
