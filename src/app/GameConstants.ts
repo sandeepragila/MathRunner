@@ -82,9 +82,12 @@ export class GameSummaryInfo {
   private _time: number;
   private _retries: number;
   private _isShortest: boolean;
-  constructor(level: number) {
+  private _mode: string;
+
+  constructor(level: number, mode: string) {
     this._level = level;
-    this._retries = 0;
+    this._retries = -1;
+    this._mode = mode;
   }
 
   get level(): number {
@@ -117,6 +120,14 @@ export class GameSummaryInfo {
 
   set isShortest(value: boolean) {
     this._isShortest = value;
+  }
+
+  get mode(): string {
+    return this._mode;
+  }
+
+  set mode(value: string) {
+    this._mode = value;
   }
 }
 

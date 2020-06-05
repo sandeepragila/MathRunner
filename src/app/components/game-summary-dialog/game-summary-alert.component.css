@@ -1,0 +1,16 @@
+table {
+  text-align: center;
+  width: 100%;
+  font-family: 'Chelsea Market'
+}
+
+th.mat-header-cell {
+  text-align: center;
+  color: #000042;
+  font-family: 'Chelsea Market'
+}
+
+td.mat-cell {
+  color: green;
+  font-family: 'Chelsea Market'
+}

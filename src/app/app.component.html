@@ -6,14 +6,15 @@
 </div>
 <div style="text-align: center; color: brown">
   <form [formGroup]="modeForm" style="display: inline-flex">
-  <mat-form-field>
+  <mat-form-field style="width: 130px">
     <mat-label>Game Difficulty</mat-label>
     <mat-select formControlName="gameMode" (selectionChange)="onDifficultyChange($event)">
       <mat-option style="color: brown" *ngFor="let mode of gameModes" [value]="mode"> {{mode.name}} </mat-option>
     </mat-select>
   </mat-form-field>
   </form>
-  <h2 style="display: inline-flex; padding-left: 30px;">Level: {{currLevelNumber + 1}}</h2>
+  <h2 style="display: inline-flex; padding-left: 30px; color: #000042">Level: <h2 style="color: brown; display: contents;">{{currLevelNumber + 1}} </h2></h2>
+  <h2 style="display: inline-flex; padding-left: 30px; color: #000042;">Score: <h2 style="color: brown; display: contents;">{{totalScore}}</h2></h2>
 </div>
 <div id="mygrid" *ngIf="display" class="divElement" style="-webkit-user-select: none;user-select: none;">
   <div style="text-align: center; color: brown">

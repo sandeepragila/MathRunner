@@ -16,6 +16,7 @@ import {MatCardModule} from '@angular/material/card';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {AudioService} from './audio/audio.service';
 import {LevelGeneratorService} from './service/level-generator.service';
+import {MatTableModule} from '@angular/material/table';
 
 @NgModule({
   exports: [
@@ -49,6 +50,7 @@ export class MyHammerConfig extends HammerGestureConfig  {
     DemoMaterialModule,
     MatNativeDateModule,
     ReactiveFormsModule,
+    MatTableModule
   ],
   entryComponents: [GameInfoAlertComponent, GameOverAlertComponent, CustomAlertDialogComponent, GameSummaryAlertComponent],
   providers: [AudioService, LevelGeneratorService, {
@@ -58,3 +60,4 @@ export class MyHammerConfig extends HammerGestureConfig  {
   bootstrap: [AppComponent]
 })
 export class AppModule { }
+

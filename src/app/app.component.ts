@@ -32,13 +32,14 @@ export class AppComponent implements AfterViewInit {
   timeLeft;
   gameSummaryInfo: Map<number, GameSummaryInfo> = new Map();
   gameModes = [
-    {id: 'EASY', name: 'EASY'},
-    {id: 'MEDIUM', name: 'MEDIUM'},
-    {id: 'HARD', name: 'HARD'}
+    {id: 'EASY', name: 'EASY', maxScore: 5, minScore: 3},
+    {id: 'MEDIUM', name: 'MEDIUM', maxScore: 10, minScore: 7},
+    {id: 'HARD', name: 'HARD', maxScore: 15, minScore: 10}
   ];
   gameDifficulty = this.gameModes[0];
   modeForm: FormGroup;
   modeValidator: Map<string, number> = new Map();
+  totalScore = 0;
 
   constructor(
     private dialog: MatDialog,
@@ -74,17 +75,32 @@ export class AppComponent implements AfterViewInit {
 
   private storeInfo() {
     const level = this.currLevelNumber + 1;
-    if (this.gameSummaryInfo.has(level)) {
-      const info: GameSummaryInfo = this.gameSummaryInfo.get(level);
-      info.time = this.currLevelInfo.timeLimit - this.timeLeft;
-      info.retries += 1;
-      info.isShortest = this.path.length === this.currLevelInfo.shortestPath;
-    } else {
-      const info: GameSummaryInfo = new GameSummaryInfo(level);
-      info.time = this.currLevelInfo.timeLimit - this.timeLeft;
-      info.isShortest = this.path.length === this.currLevelInfo.shortestPath;
-      this.gameSummaryInfo.set(level, info);
+    const info: GameSummaryInfo = this.gameSummaryInfo.get(level);
+    info.time = this.currLevelInfo.timeLimit - this.timeLeft;
+    info.retries += 1;
+    info.isShortest = this.path.length === this.currLevelInfo.shortestPath;
+  }
+
+  private calcScore() {
+    const level = this.currLevelNumber + 1;
+    const info = this.gameSummaryInfo.get(level);
+    this.totalScore += this.getScore(info.mode, info.isShortest);
+  }
+
+  private getScore(mode: string, isShortest: boolean): number {
+    let index = 0;
+    switch (mode) {
+      case 'EASY':
+        index = 0;
+        break;
+      case 'MEDIUM':
+        index = 1;
+        break;
+      case 'HARD':
+        index = 2;
+        break;
     }
+    return isShortest ? this.gameModes[index].maxScore : this.gameModes[index].minScore;
   }
 
   ngAfterViewInit(): void {
@@ -92,6 +108,7 @@ export class AppComponent implements AfterViewInit {
     this.currLevelInfo = GameConstants.getGameLevel(this.currLevelNumber);
     this.prevLevelInfo = this.currLevelInfo;
     this.modeValidator.set(this.gameDifficulty.name, 1);
+    this.gameSummaryInfo.set(this.currLevelNumber + 1, new GameSummaryInfo(this.currLevelNumber, this.gameDifficulty.id));
     this.display = true;
     this.cdr.detectChanges();
     this.addMatrixListeners();
@@ -121,6 +138,8 @@ export class AppComponent implements AfterViewInit {
   private getCorrectLevel(level: number): LevelInfo {
     const mode = this.gameDifficulty.name;
     if (level !== this.currLevelNumber) {
+      this.calcScore();
+      this.gameSummaryInfo.set(level + 1, new GameSummaryInfo(level, this.gameDifficulty.id));
       this.prevLevelInfo = this.levelGenerator.getNextLevel(this.getAsEnum());
       if (this.modeValidator.has(mode)) {
         this.modeValidator.set(mode, this.modeValidator.get(mode) + 1);
@@ -172,7 +191,8 @@ export class AppComponent implements AfterViewInit {
   private triggerGameOver() {
     const ref =  this.dialog.open(GameSummaryAlertComponent, {
       data: {
-        gameSummaryInfo: this.gameSummaryInfo
+        gameSummaryInfo: this.gameSummaryInfo,
+        totalScore: this.totalScore
       }
     });
     ref.afterClosed().subscribe(result => {
@@ -331,13 +351,17 @@ export class AppComponent implements AfterViewInit {
     // this.stopTimer();
     this.storeInfo();
     this.audio.gameOver.play();
+    const info = this.gameSummaryInfo.get(this.currLevelNumber + 1);
+    const minScore = this.getScore(info.mode, false);
+    const maxScore = this.getScore(info.mode, true);
     if (redo) {
-      const popupRef = this.raisePopup('You almost got it! But, there is a better solution with fewer steps \n' +
-        ' I hope you like challenges! :)', ['Let\'s do it again', 'That\'s all I got! Next level', 'Quit']);
+      const popupRef = this.raisePopup('You got ' + minScore + ' points! But, there is a better solution with fewer steps \n' +
+        ' which will get you ' + maxScore + ' points!\n I hope you like challenges! :)', ['Let\'s do it again', 'That\'s all I got! Next level', 'Quit']);
       popupRef.afterClosed().subscribe(result => {
         if (result === 'Let\'s do it again') {
           this.loadNextLevel(this.currLevelNumber);
         } else if (result === 'Quit') {
+          this.calcScore();
           this.triggerGameOver();
         } else {
           this.loadNextLevel(this.currLevelNumber + 1);
@@ -346,17 +370,22 @@ export class AppComponent implements AfterViewInit {
       return;
     }
 
-    const dialogRef = this.dialog.open(GameOverAlertComponent);
+    const dialogRef = this.dialog.open(GameOverAlertComponent, {
+      data: {
+        points: maxScore
+      }});
     dialogRef.afterClosed().subscribe(result => {
       if (result === 'Let\'s Go!') {
         this.loadNextLevel(this.currLevelNumber + 1);
       } else {
+        this.calcScore();
         this.triggerGameOver();
       }
     })
   }
 
   quitGame(event) {
+    this.gameSummaryInfo.delete(this.currLevelNumber + 1);
     this.triggerGameOver();
   }
 }
