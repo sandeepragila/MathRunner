@@ -1,6 +1,10 @@
 # MathRunner
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.1.3.
+A Simple math game that tests your math computing ability. Give it a try by tapping on the link below.
+
+[Math Runner](https://mathrunner.fun).
+
+`https://mathrunner.fun` 
 
 ## Development server
 
