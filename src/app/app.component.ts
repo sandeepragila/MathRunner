@@ -170,10 +170,15 @@ export class AppComponent implements AfterViewInit {
         this.gameDifficulty = event.value;
         this.raisePopup('You earned it! Your next level difficulty is set to ' + this.gameDifficulty.name);
       } else {
-        const levelsToComplete = this.modeValidator.has(this.gameDifficulty.name) ?
-          7 - this.modeValidator.get(this.gameDifficulty.name) : 7;
+        let mode = 'EASY';
+        let levelsToComplete = this.modeValidator.has(mode) ?
+          7 - this.modeValidator.get(mode) : 7;
+        if (levelsToComplete <= 0) {
+          mode = 'MEDIUM';
+          levelsToComplete = this.modeValidator.has(mode) ? 7 - this.modeValidator.get(mode) : 7;
+        }
         this.modeForm.controls['gameMode'].patchValue(this.gameDifficulty);
-        this.raisePopup('In a hurry? You need to complete ' + levelsToComplete + ' more ' + this.gameDifficulty.name + ' levels to switch to HARD difficulty');
+        this.raisePopup('In a hurry? You need to complete ' + levelsToComplete + ' more ' + mode + ' levels to switch to HARD difficulty');
       }
     }
   }
