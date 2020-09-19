@@ -33,7 +33,8 @@ export class GameSummaryAlertComponent {
     //   }
     // });
     this.levelsCompleted.forEach(((value, key) => {
-      this.tableData.push({mode: key, levelsCompleted: value});
+      const val = value - 1;
+      this.tableData.push({mode: key, levelsCompleted: val});
     }));
   }
 
