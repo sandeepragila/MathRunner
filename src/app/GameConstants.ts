@@ -1,5 +1,7 @@
 
 export class GameConstants {
+  public static MR_LEVELINFO_COOKIE = 'mr-levelinfo';
+  public static MR_CURR_LEVEL_COOKIE = 'mr-curr-level';
   static GameLevels: LevelInfo[] = [];
 
   public static getGameLevel(level: number) {

@@ -10,6 +10,7 @@ import {AudioService} from './audio/audio.service';
 import {GameDifficulty, LevelGeneratorService} from './service/level-generator.service';
 import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
 import 'hammerjs';
+import {CookieService} from "ngx-cookie-service";
 
 @Component({
   selector: 'app-root',
@@ -41,12 +42,15 @@ export class AppComponent implements AfterViewInit {
   modeValidator: Map<string, number> = new Map();
   totalScore = 0;
 
+  cookieValue: string;
+
   constructor(
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef,
     public audio: AudioService,
     public levelGenerator: LevelGeneratorService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private cookieService: CookieService
   ) {
     this.modeForm = fb.group({
       gameMode: [this.gameDifficulty]
@@ -104,21 +108,39 @@ export class AppComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.dialog.open(GameInfoAlertComponent).afterClosed().subscribe(result => {
-    this.currLevelInfo = GameConstants.getGameLevel(this.currLevelNumber);
-    this.prevLevelInfo = this.currLevelInfo;
-    this.modeValidator.set(this.gameDifficulty.name, 1);
+    if (this.cookieService.check(GameConstants.MR_CURR_LEVEL_COOKIE)
+      && this.cookieService.check(GameConstants.MR_LEVELINFO_COOKIE)) {
+      this.gameDifficulty = GameDifficulty[this.cookieService.get(GameConstants.MR_CURR_LEVEL_COOKIE)];
+      const levelInfo = this.cookieService.get(GameConstants.MR_LEVELINFO_COOKIE);
+      const info = levelInfo.split("|");
+      this.modeValidator.set('EASY', Number(info[0]));
+      this.modeValidator.set('MEDIUM', Number(info[1]));
+      this.modeValidator.set('HARD', Number(info[2]));
+      this.currLevelNumber = Number(info[3]);
+      this.totalScore = Number(info[4]);
+      this.currLevelInfo = this.levelGenerator.getNextLevel(this.getAsEnum());
+      this.setup();
+    } else {
+      this.dialog.open(GameInfoAlertComponent).afterClosed().subscribe(result => {
+        this.currLevelInfo = GameConstants.getGameLevel(this.currLevelNumber);
+        this.prevLevelInfo = this.currLevelInfo;
+        this.modeValidator.set(this.gameDifficulty.name, 1);
+        this.setup();
+      })
+    }
+  }
+
+  private setup() {
     this.gameSummaryInfo.set(this.currLevelNumber + 1, new GameSummaryInfo(this.currLevelNumber, this.gameDifficulty.id));
     this.display = true;
     this.cdr.detectChanges();
     this.addMatrixListeners();
     this.startGame = true;
     this.audio.bg.play();
-    // this.startTimer();
-    })
   }
 
   private loadNextLevel(level: number) {
+    this.updateCookie()
     this.path = [];
     this.startGame = false;
     this.display = false;
@@ -133,6 +155,20 @@ export class AppComponent implements AfterViewInit {
     this.startGame = true;
     this.audio.bg.play();
     // this.startTimer();
+  }
+
+  private updateCookie() {
+    this.cookieService.set(GameConstants.MR_CURR_LEVEL_COOKIE, this.gameDifficulty.name);
+    const levelInfoStr = this.getOrDefault(GameDifficulty.EASY.toString()) + '|'
+      + this.getOrDefault(GameDifficulty.MEDIUM.toString()) + '|'
+      + this.getOrDefault(GameDifficulty.HARD.toString()) + '|'
+      + this.currLevelNumber + '|'
+      + this.totalScore;
+    this.cookieService.set(GameConstants.MR_LEVELINFO_COOKIE, levelInfoStr);
+  }
+
+  private getOrDefault(mode: string): number {
+    return this.modeValidator.has(mode) ? this.modeValidator.get(mode) : 0;
   }
 
   private getCorrectLevel(level: number): LevelInfo {
