@@ -20,17 +20,18 @@ export class GameSummaryAlertComponent {
     this.dialogRef.disableClose = true;
     this.gameSummaryInfo = data.gameSummaryInfo;
     this.totalScore = data.totalScore;
+    this.levelsCompleted = data.levelsCompleted;
     this.calculateDisplayData();
   }
 
   private calculateDisplayData() {
-    this.gameSummaryInfo.forEach((value, key) => {
-      if (this.levelsCompleted.has(value.mode)) {
-        this.levelsCompleted.set(value.mode, this.levelsCompleted.get(value.mode) + 1);
-      } else {
-        this.levelsCompleted.set(value.mode, 1);
-      }
-    });
+    // this.gameSummaryInfo.forEach((value, key) => {
+    //   if (this.levelsCompleted.has(value.mode)) {
+    //     this.levelsCompleted.set(value.mode, this.levelsCompleted.get(value.mode) + 1);
+    //   } else {
+    //     this.levelsCompleted.set(value.mode, 1);
+    //   }
+    // });
     this.levelsCompleted.forEach(((value, key) => {
       this.tableData.push({mode: key, levelsCompleted: value});
     }));

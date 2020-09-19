@@ -41,15 +41,15 @@ mat-grid-tile {
 }
 
 .footer {
-  position: absolute;
   text-align: right;
   padding-right: 10px;
   bottom: 0;
-  width: 100%;
+  right: 0;
+  position: relative;
+  display: block;
+  padding-top: 40px;
   font-size: small;
   /* Set the fixed height of the footer here */
-  height: 50px;
-  line-height: 60px;
 }
 
 a {

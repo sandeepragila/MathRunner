@@ -11,6 +11,7 @@ import {GameDifficulty, LevelGeneratorService} from './service/level-generator.s
 import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
 import 'hammerjs';
 import {CookieService} from "ngx-cookie-service";
+import {GameNewsAlertComponent} from "./components/game-news-dialog/game-news-alert.component";
 
 @Component({
   selector: 'app-root',
@@ -110,7 +111,15 @@ export class AppComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     if (this.cookieService.check(GameConstants.MR_CURR_LEVEL_COOKIE)
       && this.cookieService.check(GameConstants.MR_LEVELINFO_COOKIE)) {
-      this.gameDifficulty = GameDifficulty[this.cookieService.get(GameConstants.MR_CURR_LEVEL_COOKIE)];
+      const gameMode = this.cookieService.get(GameConstants.MR_CURR_LEVEL_COOKIE);
+      if (gameMode === 'HARD') {
+        this.gameDifficulty = this.gameModes[2];
+      } else if (gameMode === 'MEDIUM') {
+        this.gameDifficulty = this.gameModes[1];
+      } else {
+        this.gameDifficulty = this.gameModes[0];
+      }
+      this.modeForm.controls['gameMode'].patchValue(this.gameDifficulty);
       const levelInfo = this.cookieService.get(GameConstants.MR_LEVELINFO_COOKIE);
       const info = levelInfo.split("|");
       this.modeValidator.set('EASY', Number(info[0]));
@@ -121,11 +130,13 @@ export class AppComponent implements AfterViewInit {
       this.currLevelInfo = this.levelGenerator.getNextLevel(this.getAsEnum());
       this.setup();
     } else {
+      this.dialog.open(GameNewsAlertComponent).afterClosed().subscribe( result => {
       this.dialog.open(GameInfoAlertComponent).afterClosed().subscribe(result => {
         this.currLevelInfo = GameConstants.getGameLevel(this.currLevelNumber);
         this.prevLevelInfo = this.currLevelInfo;
         this.modeValidator.set(this.gameDifficulty.name, 1);
         this.setup();
+      })
       })
     }
   }
@@ -140,7 +151,6 @@ export class AppComponent implements AfterViewInit {
   }
 
   private loadNextLevel(level: number) {
-    this.updateCookie()
     this.path = [];
     this.startGame = false;
     this.display = false;
@@ -154,17 +164,18 @@ export class AppComponent implements AfterViewInit {
     this.addMatrixListeners();
     this.startGame = true;
     this.audio.bg.play();
-    // this.startTimer();
+    this.updateCookie()
   }
 
   private updateCookie() {
-    this.cookieService.set(GameConstants.MR_CURR_LEVEL_COOKIE, this.gameDifficulty.name);
-    const levelInfoStr = this.getOrDefault(GameDifficulty.EASY.toString()) + '|'
-      + this.getOrDefault(GameDifficulty.MEDIUM.toString()) + '|'
-      + this.getOrDefault(GameDifficulty.HARD.toString()) + '|'
+    this.cookieService.set(GameConstants.MR_CURR_LEVEL_COOKIE, this.gameDifficulty.name, 2);
+    const levelInfoStr = this.getOrDefault('EASY') + '|'
+      + this.getOrDefault('MEDIUM') + '|'
+      + this.getOrDefault('HARD') + '|'
       + this.currLevelNumber + '|'
       + this.totalScore;
-    this.cookieService.set(GameConstants.MR_LEVELINFO_COOKIE, levelInfoStr);
+    this.cookieService.set(GameConstants.MR_LEVELINFO_COOKIE, levelInfoStr, 2);
+    console.log('Updating cookies to ' + levelInfoStr);
   }
 
   private getOrDefault(mode: string): number {
@@ -236,6 +247,7 @@ export class AppComponent implements AfterViewInit {
     const ref =  this.dialog.open(GameSummaryAlertComponent, {
       data: {
         gameSummaryInfo: this.gameSummaryInfo,
+        levelsCompleted: this.modeValidator,
         totalScore: this.totalScore
       }
     });
@@ -431,6 +443,16 @@ export class AppComponent implements AfterViewInit {
   quitGame(event) {
     this.gameSummaryInfo.delete(this.currLevelNumber + 1);
     this.triggerGameOver();
+  }
+
+  resetGame(event) {
+    const popupRef = this.raisePopup('Are you sure you want to reset the game? All your progress will be gone!', ['No', 'Yes']);
+    popupRef.afterClosed().subscribe(result => {
+      if (result === 'Yes') {
+        this.cookieService.deleteAll();
+        window.location.reload();
+      }
+    })
   }
 }
 
