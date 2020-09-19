@@ -39,3 +39,19 @@ mat-grid-tile {
   height: 7rem;
   width: 7rem;
 }
+
+.footer {
+  text-align: right;
+  padding-right: 10px;
+  bottom: 0;
+  right: 0;
+  position: relative;
+  display: block;
+  padding-top: 40px;
+  font-size: small;
+  /* Set the fixed height of the footer here */
+}
+
+a {
+  color: brown !important;
+}

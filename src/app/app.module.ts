@@ -17,6 +17,8 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {AudioService} from './audio/audio.service';
 import {LevelGeneratorService} from './service/level-generator.service';
 import {MatTableModule} from '@angular/material/table';
+import {CookieService} from "ngx-cookie-service";
+import {GameNewsAlertComponent} from "./components/game-news-dialog/game-news-alert.component";
 
 @NgModule({
   exports: [
@@ -39,7 +41,8 @@ export class MyHammerConfig extends HammerGestureConfig  {
     GameOverAlertComponent,
     CustomAlertDialogComponent,
     GameSummaryAlertComponent,
-    GameInfoAlertComponent
+    GameInfoAlertComponent,
+    GameNewsAlertComponent
   ],
   imports: [
     NgbModule,
@@ -52,8 +55,8 @@ export class MyHammerConfig extends HammerGestureConfig  {
     ReactiveFormsModule,
     MatTableModule
   ],
-  entryComponents: [GameInfoAlertComponent, GameOverAlertComponent, CustomAlertDialogComponent, GameSummaryAlertComponent],
-  providers: [AudioService, LevelGeneratorService, {
+  entryComponents: [GameInfoAlertComponent, GameOverAlertComponent, CustomAlertDialogComponent, GameSummaryAlertComponent, GameNewsAlertComponent],
+  providers: [CookieService, AudioService, LevelGeneratorService, {
     provide: HAMMER_GESTURE_CONFIG,
     useClass: MyHammerConfig
   }],
