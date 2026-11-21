@@ -1,8 +1,0 @@
-@font-face {
-  font-family: 'Chelsea Market';
-  font-style: normal;
-  font-weight: 400;
-  src: url(assets/fonts/ChelseaMarket/Chelsea-Market.eot);
-  src: local('Chelsea Market'), local('ChelseaMarket-Regular'), url(assets/fonts/ChelseaMarket/Chelsea-Market.ttf) format('truetype'), url(assets/fonts/ChelseaMarket/Chelsea-Market.eot?#iefix) format('embedded-opentype'), url(assets/fonts/ChelseaMarket/Chelsea-Market.woff) format('woff'), url(assets/fonts/ChelseaMarket/Chelsea-Market.woff2) format('woff2'), url(assets/fonts/ChelseaMarket/Chelsea-Market.svg#ChelseaMarket) format('svg');
-}
-

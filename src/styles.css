@@ -1,6 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 @import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
-@import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+
 
 body {
   font-family: "Chelsea Market", sans-serif;
@@ -17,15 +17,11 @@ button {
 }
 
 @font-face {
-  font-family: "Symbola";
-  src: url("./assets/fonts/Symbola-Emoji/Symbola-Emoji.woff") format("woff"),
-  url("./assets/fonts/Symbola-Emoji/Symbola-Emoji.ttf") format("ttf");
-}
-
-@font-face {
   font-family: 'Chelsea Market';
   font-style: normal;
   font-weight: 400;
-  src: url(assets/fonts/ChelseaMarket/Chelsea-Market.eot);
-  src: local('Chelsea Market'), local('ChelseaMarket-Regular'), url(assets/fonts/ChelseaMarket/Chelsea-Market.ttf) format('truetype'), url(assets/fonts/ChelseaMarket/Chelsea-Market.eot?#iefix) format('embedded-opentype'), url(assets/fonts/ChelseaMarket/Chelsea-Market.woff) format('woff'), url(assets/fonts/ChelseaMarket/Chelsea-Market.woff2) format('woff2'), url(assets/fonts/ChelseaMarket/Chelsea-Market.svg#ChelseaMarket) format('svg');
+  src: url(assets/fonts/ChelseaMarket/Chelsea-Market.woff2) format('woff2');
 }
+
+* { box-sizing: border-box; }
+body { line-height: 1.5; }

@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {LevelInfo} from '../GameConstants';
+import {shortestPath} from '../game/shortest-path';
 
 @Injectable()
 export class LevelGeneratorService {
@@ -20,6 +21,9 @@ export class LevelGeneratorService {
   }
 
   public getLevel(rowSize: number, colSize: number): LevelInfo {
+    if (!Number.isInteger(rowSize) || !Number.isInteger(colSize) || rowSize < 2 || colSize < 2 || rowSize > 9 || colSize > 9) {
+      throw new Error('Board dimensions must be between 2 and 9.');
+    }
     const maxAllowedResult = this.getRandomInt(0, (Math.max(rowSize, colSize) * 10), 30);
     const grid: Block[][] = [];
 
@@ -36,16 +40,12 @@ export class LevelGeneratorService {
     const finalMinDistance = this.findFinalSolution(grid, rowSize, colSize, princessBlock.val);
 
     const levelInfo = new LevelInfo(this.getAsFlatArray(grid), colSize, princessBlock.val,
-      Math.min(princessBlock.pathLen, finalMinDistance), 60);
+      finalMinDistance, 60);
     return levelInfo;
   }
 
   private findFinalSolution(grid: Block[][], row, col, resultSum): number {
-    const finalMinDistance: number[] = [Number.MAX_SAFE_INTEGER];
-    this.recursiveMinPathFinder(grid, row - 1, col - 2, finalMinDistance, 1, resultSum);
-    this.recursiveMinPathFinder(grid, row - 2, col - 2, finalMinDistance, 1, resultSum);
-    this.recursiveMinPathFinder(grid, row - 2, col - 1, finalMinDistance, 1, resultSum);
-    return finalMinDistance[0];
+    return shortestPath(this.getAsFlatArray(grid), col, resultSum);
   }
 
   private getAsFlatArray(grid: Block[][]) {
@@ -56,49 +56,6 @@ export class LevelGeneratorService {
       })
     });
     return resultArr;
-  }
-
-  /**
-   * Recursive algorithm to find the shortest path using a buttom-up approach. This
-   * is to ensure we have the shortest path as the heuristic algorithem only tries to
-   * find the most probable solution and not the best possible.
-   *
-   * @param grid input matrix
-   * @param row curr row index we are on
-   * @param col curr col index we are on
-   * @param finalMinDistance reference variable to store the final min distance
-   * @param currMinDistance current distance at each cell. local to its recursive run
-   * @param resultSum result sum which will be local to its recursive run
-   */
-  private recursiveMinPathFinder(grid: Block[][], row, col, finalMinDistance: number[],
-                                 currMinDistance, resultSum) {
-    if (row < 0 || col < 0 || currMinDistance > finalMinDistance[0]) {
-      return;
-    }
-
-    const currVal = grid[row][col].val;
-    if (row === 0 && col === 0) {
-      if (resultSum === currVal) {
-        finalMinDistance[0] = Math.min(finalMinDistance[0], currMinDistance);
-      }
-      return;
-    }
-
-    if (currVal > resultSum) {
-      return;
-    }
-
-    if ((resultSum % currVal) === 0  && (resultSum / currVal) > 0) {
-      this.recursiveMinPathFinder(grid, row - 1,
-        col - 1, finalMinDistance, currMinDistance + 1, resultSum / currVal);
-    }
-
-    if ((resultSum - currVal) > 0) {
-      this.recursiveMinPathFinder(grid, row - 1, col,
-        finalMinDistance, currMinDistance + 1, resultSum - currVal);
-      this.recursiveMinPathFinder(grid, row,
-        col - 1, finalMinDistance, currMinDistance + 1, resultSum - currVal);
-    }
   }
 
   /**
@@ -137,7 +94,7 @@ export class LevelGeneratorService {
   }
 
   private pickRandomResult(row, col, grid) {
-    const randomSolution: number = this.getMaxRandomInt(4);
+    const randomSolution: number = this.getMaxRandomInt(3);
     const princessBlock: Block = grid[row][col];
     const leftBlock = grid[row][col - 1];
     const topBlock = grid[row - 1][col];
@@ -157,10 +114,10 @@ export class LevelGeneratorService {
 
   // check if the chosen result matches with the other two. if so, pick the fastest
   private pickShortestIfSame(chosenBlock: Block, option1: Block, option2: Block): Block {
-    if (chosenBlock.val === option1.val && option1.pathLen < chosenBlock.pathLen) {
+    if (chosenBlock.pathWeight === option1.pathWeight && option1.pathLen < chosenBlock.pathLen) {
       chosenBlock = option1;
     }
-    if (chosenBlock.val === option2.val && option2.pathLen < chosenBlock.pathLen) {
+    if (chosenBlock.pathWeight === option2.pathWeight && option2.pathLen < chosenBlock.pathLen) {
       chosenBlock = option2;
     }
     return chosenBlock;
@@ -197,7 +154,7 @@ export class LevelGeneratorService {
 
     // if no valid result found then take a min step
     if (maxValForCurrBlock === 0) {
-      if (valFromleft > valFromTop) {
+      if (valFromleft < valFromTop) {
         grid[row][col].pathWeight = valFromleft;
         currBlock.pathLen = grid[row ][col - 1].pathLen + 1;
       } else {
@@ -214,7 +171,9 @@ export class LevelGeneratorService {
       case GameDifficulty.MEDIUM:
         return GameDifficulty.EASY;
       case GameDifficulty.HARD:
-        return GameDifficulty.MEDIUM
+        return GameDifficulty.MEDIUM;
+      default:
+        throw new Error('Unknown difficulty');
     }
   }
 

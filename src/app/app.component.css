@@ -1,57 +1,11 @@
-mat-grid-tile {
-  background: lightblue;
-}
-
-.divElement {
-  /*position: fixed;*/
-  top: 70%;
-  left: 50%;
-  /*height: 100vh;*/
-  /*width: 100vh;*/
-  /*-webkit-transform: translate(-50%, -50%);*/
-  /*transform: translate(-50%, -50%);*/
-}
-
-.startHere {
-  pointer-events: none;
-  align-self: start;
-  text-align: left;
-  float: left;
-  position: absolute;
-  left: 0px;
-  font-family: Chelsea Market;
-  font-size: smaller;
-}
-
-/deep/ .mat-select{
-  color: brown;
-}
-
-/deep/ .mat-select-placeholder {
-  color: brown;
-}
-
-/deep/ .mat-form-field-type-mat-select .mat-form-field-label, .mat-select-value {
-  color: brown;
-}
-
-.logo {
-  height: 7rem;
-  width: 7rem;
-}
-
-.footer {
-  text-align: right;
-  padding-right: 10px;
-  bottom: 0;
-  right: 0;
-  position: relative;
-  display: block;
-  padding-top: 40px;
-  font-size: small;
-  /* Set the fixed height of the footer here */
-}
-
-a {
-  color: brown !important;
-}
+main { max-width: 800px; margin: auto; padding: 16px; text-align: center; color: #000042; }
+h1 { font-size: clamp(24px, 4vw, 36px); }
+.logo { width: 64px; height: 64px; vertical-align: middle; }
+.toolbar { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; align-items: center; }
+select { display: block; font: inherit; padding: 8px; margin: 6px auto; }
+.rules { font-size: 14px; line-height: 1.6; }
+.message { min-height: 24px; color: #9b2633; }
+.success { padding: 12px; border: 2px solid #3b7253; border-radius: 8px; margin-bottom: 16px; }
+nav { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px; }
+footer { margin: 24px 0; font-size: 14px; }
+a { color: #7d3030; }
