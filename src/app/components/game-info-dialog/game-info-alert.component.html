@@ -1,21 +1,13 @@
-<mat-dialog-content style="text-align: center;" class="chelsea">
-  <h1 style="color: #000042;">Math Runner <img class="logo" src="assets/images/logo.png"> </h1>
-  <div *ngIf="toggle">
-  <h2 style="color: #000042;">Welcome to the game!
-    The game tests your math computing ability. You will be shown a grid and imagine you are on the first cell(top left) and
-    your princess is in the last cell (bottom right). You want to get there with as fewer steps as possible.
-    But, you need to follow some simple rules. Click next to see the instructions.</h2>
-  </div>
-  <div *ngIf="!toggle">
-    <div class="image">
-      <img *ngIf="!toggle" [ngClass]="{ 'desktop-view': width >= 768, 'mobile-view': width < 768
-}"[src]="currImage.image" [alt]="currImage.id">
-    </div>
-  </div>
+<h2 mat-dialog-title>How to play MathRunner</h2>
+<mat-dialog-content>
+  <p *ngIf="currIndex === -1">Find a path through a grid using addition and multiplication. There is no time limit.</p>
+  <p *ngIf="currIndex >= 0">Step {{currIndex + 1}} of {{instructions.length}}: {{instructions[currIndex]}}</p>
+  <img *ngIf="currIndex >= 0" class="instruction-image" [src]="'assets/images/instruction-' + (currIndex + 1) + '.PNG'"
+       [alt]="instructions[currIndex]">
+  <p>Tap or click cells, or drag across them. With a keyboard, use Tab or arrow keys to focus a cell and Enter or Space to select it.</p>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-raised-button *ngFor="let button of buttons;" [id]="button.id"
-         (click)="onClick($event)" style="color: #287b26;">
-    {{button.name}}
-  </button>
+  <button mat-button *ngIf="currIndex >= 0" (click)="onClick('back')">Back</button>
+  <button mat-raised-button *ngIf="currIndex < instructions.length - 1" (click)="onClick('next')">Next</button>
+  <button mat-raised-button *ngIf="currIndex === instructions.length - 1" (click)="onClick('go')">Let's Go!</button>
 </mat-dialog-actions>

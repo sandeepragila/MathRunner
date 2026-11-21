@@ -1,7 +1,7 @@
 <mat-dialog-content style="text-align: center; font-family: 'Chelsea Market'">
-<h1 style="color: #000042">Math Runner  <img style="height: 7rem; width: 7rem;" src="assets/images/logo.png"> </h1>
+<h1 style="color: #000042">Math Runner  <img style="height: 7rem; width: 7rem;" src="assets/images/logo.png" alt="MathRunner logo"> </h1>
 <h2 style="color: #000042">Well played!! Below are your game results</h2>
-  <h2 style="color: #000042">Score: <h2 style="color: brown; display: inline-block;">{{totalScore}} </h2></h2>
+  <h2 style="color: #000042">Score: <span style="color: brown;">{{totalScore}}</span></h2>
   <table mat-table [dataSource]="tableData" class="mat-elevation-z8">
     <!-- Item Column -->
     <ng-container matColumnDef="mode">
@@ -22,8 +22,9 @@
 <p style="color: red">Now take a screenshot and share your score!</p>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close="resume">Resume game</button>
   <button mat-raised-button
-        (click)="onClick($event)" style="color: #287b26;">
-    New Game
+        mat-dialog-close="new" style="color: #287b26;">
+    New Game…
   </button>
 </mat-dialog-actions>

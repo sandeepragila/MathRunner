@@ -1,0 +1,11 @@
+<div class="board" role="group" aria-label="Puzzle board. Use arrow keys to move focus, Enter or Space to select."
+     [style.grid-template-columns]="'repeat(' + board.cols + ', minmax(0, 1fr))'">
+  <button *ngFor="let value of board.matrix; let i = index; let last = last" type="button"
+          [attr.data-cell]="i" [attr.aria-label]="label(i)" [attr.aria-pressed]="path.includes(i)"
+          [class.selected]="path.includes(i)" [disabled]="disabled"
+          (pointerdown)="pointerDown($event, i)" (click)="click($event, i)" (keydown)="key($event, i)">
+    <span *ngIf="i === 0" class="start">Start</span>
+    <span *ngIf="!last">{{value}}</span>
+    <img *ngIf="last" src="assets/images/princess-t.png" alt="" draggable="false">
+  </button>
+</div>

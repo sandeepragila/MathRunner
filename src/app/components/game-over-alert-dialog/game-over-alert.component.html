@@ -1,8 +1,10 @@
-<h2 matDialogTitle style="text-align: center; font-family: 'Chelsea Market'">Yayyy!! Great job. You got {{points}} points!</h2>
+<h2 matDialogTitle style="text-align: center; font-family: 'Chelsea Market'">
+  Yayyy!! Great job. You got {{points}} points!
+</h2>
 <mat-dialog-content style="text-align: center; font-family: 'Chelsea Market'">
   <p>Too easy? Try the next one!</p>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-raised-button matDialogClose="Let's Go!" style="color: #287b26;">Let's Go!</button>
-  <button mat-button matDialogClose="I don't have what it takes! Quit" color="warn">I don't have what it takes! Quit</button>
+  <button mat-raised-button mat-dialog-close="next" style="color: #287b26;">Let's Go!</button>
+  <button mat-button mat-dialog-close="quit" color="warn">I don't have what it takes! Quit</button>
 </mat-dialog-actions>

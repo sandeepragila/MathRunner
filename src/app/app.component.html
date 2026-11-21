@@ -1,52 +1,40 @@
-<div style="text-align:center; font-family: 'Chelsea Market'; color: #000042;">
-  <h1>
-    Welcome to {{ title }}!
-    <img class="logo" src="assets/images/logo.png">
-  </h1>
-</div>
-<div style="text-align: center; color: brown">
-  <form [formGroup]="modeForm" style="display: inline-flex">
-  <mat-form-field style="width: 130px">
-    <mat-label>Game Difficulty</mat-label>
-    <mat-select formControlName="gameMode" (selectionChange)="onDifficultyChange($event)">
-      <mat-option style="color: brown" *ngFor="let mode of gameModes" [value]="mode"> {{mode.name}} </mat-option>
-    </mat-select>
-  </mat-form-field>
-  </form>
-  <h2 style="display: inline-flex; padding-left: 30px; color: #000042">Level: <h2 style="color: brown; display: contents;">{{currLevelNumber + 1}} </h2></h2>
-  <h2 style="padding-left: 30px; color: #000042;">Score: <h2 style="color: brown; display: contents;">{{totalScore}}</h2></h2>
-</div>
-<div id="mygrid" *ngIf="display" class="divElement" style="-webkit-user-select: none;user-select: none;">
-  <div style="text-align: center; color: brown">
-    <h2>Miles to reach me: {{currLevelInfo.solution}}</h2>
+<main *ngIf="game">
+  <header><h1>Welcome to {{title}}! <img class="logo" src="assets/images/logo.png" alt="MathRunner logo"></h1></header>
+  <div class="toolbar">
+    <label>Next level difficulty
+      <select [value]="game.state.nextMode" (change)="changeMode($event.target.value)">
+        <option *ngFor="let mode of modes" [value]="mode" [disabled]="!game.canSelect(mode)">{{mode}}</option>
+      </select>
+    </label>
+    <p>Level: <strong>{{game.state.level}}</strong> · {{game.state.mode}}</p>
+    <p>Score: <strong>{{game.state.score}}</strong></p>
   </div>
-  <div style="text-align: center;">
-    Result = {{result}}
-  </div>
-  <div style="width: 100%;height: 100%;">
-  <mat-grid-list cols="{{currLevelInfo.cols}}" rowHeight="80px">
-    <mat-grid-tile *ngFor="let num of currLevelInfo.matrix; let i = index; let last = last; let first = first;" [attr.data-index]="i"
-                   (mousedown)="myChangeEvent($event, true)" (mouseover)="myChangeEvent($event, false)">
-      <span *ngIf="first" class="startHere">Start Here!</span>
-      <span *ngIf="!last" style="pointer-events: none"> {{ num }} </span>
-      <img *ngIf="last" src="assets/images/princess-t.png"
-           alt="Miles to reach me: {{currLevelInfo.solution}}" style="object-fit: cover; pointer-events: none; height: inherit; width: inherit;">
-    </mat-grid-tile>
-  </mat-grid-list>
-  </div>
-  <br>
-  <br>
-  <div style="text-align: center">
-    <button mat-raised-button
-          (click)="quitGame($event)" style="color: brown;">
-      Quit Game
+  <p class="rules">Right or down: add. Diagonal: multiply. Select your last cell to undo.</p>
+  <p class="rules">Unlock Medium after 7 Easy completions, and Hard after 7 Medium completions.</p>
+  <h2>Target: {{game.state.board.solution}}</h2>
+  <p aria-live="polite" aria-atomic="true">Result = {{game.result}}</p>
+  <app-game-board [board]="game.state.board" [path]="game.state.path" [disabled]="!ready || game.state.solved"
+                  (choose)="move($event)"></app-game-board>
+  <p class="message" role="status">{{message}}</p>
+  <section *ngIf="game.state.solved" class="success" aria-live="polite">
+    <h2>Well done! Best score for this level: {{game.state.credited}} points.</h2>
+    <p *ngIf="game.state.path.length === game.state.board.shortestPath">You found a shortest path!</p>
+    <p *ngIf="game.state.path.length !== game.state.board.shortestPath && game.canImprove">
+      A shorter path can earn more points. Try again to improve your score.
+    </p>
+    <button mat-raised-button (click)="next()">Next level</button>
+    <button mat-button (click)="retry()">Try again</button>
+  </section>
+  <nav aria-label="Game controls">
+    <button mat-button *ngIf="!game.state.solved" (click)="retry()">Restart level</button>
+    <button mat-button *ngIf="!game.state.solved && game.state.credited > 0" (click)="next()">
+      Keep best score and continue
     </button>
-    <button mat-raised-button
-            (click)="resetGame($event)" style="color: brown; margin-left: 40px;">
-      Reset Game
-    </button>
-    <a href="mailto:mathrunner.fun@gmail.com?subject=Feedback for MathRunner!" class="footer text-center py-3" >Contact Developer</a>
-  </div>
-</div>
-
-
+    <button mat-button (click)="instructions()">How to play</button>
+    <button mat-button (click)="audio.toggle()">{{audio.muted ? 'Enable sound' : 'Mute sound'}}</button>
+    <button mat-button (click)="quit()">Quit / Summary</button>
+    <button mat-button (click)="reset()">Reset game</button>
+  </nav>
+  <p *ngIf="!storage.available" role="status">Browser storage is unavailable. Progress will last for this visit only.</p>
+  <footer><a href="mailto:mathrunner.fun@gmail.com?subject=Feedback for MathRunner!">Contact Developer</a></footer>
+</main>

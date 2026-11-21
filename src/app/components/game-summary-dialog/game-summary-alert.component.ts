@@ -1,49 +1,17 @@
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {GameSummaryInfo} from '../../GameConstants';
 
-@Component({
-  selector: 'app-game-summary',
-  templateUrl: './game-summary-alert.component.html',
-  styleUrls: ['./game-summary-alert.component.css']
-})
-
+@Component({selector: 'app-game-summary', templateUrl: './game-summary-alert.component.html',
+  styleUrls: ['./game-summary-alert.component.css']})
 export class GameSummaryAlertComponent {
-  displayedColumns: string[] = ['mode', 'levelsCompleted'];
-  gameSummaryInfo: Map<number, GameSummaryInfo> = new Map();
-  levelsCompleted: Map<string, number> = new Map();
-  tableData: GameData[] = [];
+  displayedColumns = ['mode', 'levelsCompleted'];
+  tableData: Array<{mode: string; levelsCompleted: number}>;
   totalScore: number;
-  constructor(
-    @Inject(MAT_DIALOG_DATA) private data: any,
-    private dialogRef: MatDialogRef<GameSummaryAlertComponent>) {
-    this.dialogRef.disableClose = true;
-    this.gameSummaryInfo = data.gameSummaryInfo;
+
+  constructor(@Inject(MAT_DIALOG_DATA) data: {totalScore: number; levelsCompleted: Map<string, number>},
+              private dialogRef: MatDialogRef<GameSummaryAlertComponent>) {
+    dialogRef.disableClose = true;
     this.totalScore = data.totalScore;
-    this.levelsCompleted = data.levelsCompleted;
-    this.calculateDisplayData();
+    this.tableData = Array.from(data.levelsCompleted, ([mode, levelsCompleted]) => ({mode, levelsCompleted}));
   }
-
-  private calculateDisplayData() {
-    // this.gameSummaryInfo.forEach((value, key) => {
-    //   if (this.levelsCompleted.has(value.mode)) {
-    //     this.levelsCompleted.set(value.mode, this.levelsCompleted.get(value.mode) + 1);
-    //   } else {
-    //     this.levelsCompleted.set(value.mode, 1);
-    //   }
-    // });
-    this.levelsCompleted.forEach(((value, key) => {
-      const val = value - 1;
-      this.tableData.push({mode: key, levelsCompleted: val});
-    }));
-  }
-
-  onClick(event) {
-    window.location.reload();
-  }
-}
-
-export interface GameData {
-  mode: string;
-  levelsCompleted: number;
 }
